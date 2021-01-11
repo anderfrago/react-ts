@@ -128,11 +128,64 @@ Ahora podremos obtener el estado y el despacho de cualquier componente. Para fac
 
 ## Añadiendo artículos. Interfaces de tipografía vs. tipos
 
+En este capítulo, definiremos las acciones y los reductores necesarios para crear nuevas tarjetas y componentes. Proporcionaremos el método de envío del reductor a través del Contexto Reaccionario y lo utilizaremos en nuestro componente AddNewItem.
 
+### Definir las acciones
 
+ Empezaremos añadiendo dos acciones: AGREGAR\_TAREAS y AGREGAR\_LISTAS. Para hacer esto tendremos que definir un tipo de acción. Abre src/AppStateContext y define un nuevo tipo:
 
+{% code title="AppStateContext.tsx" %}
+```typescript
+type Action =
+  | {
+      type: "ADD_LIST";
+      payload: string;
+    }
+  | {
+      type: "ADD_TASK";
+      payload: { text: string; taskId: string };
+    };
+```
+{% endcode %}
 
+La técnica que estamos usando aquí se llama unión discriminada. Hemos definido un tipo de acción y luego hemos pasado dos interfaces separadas por un Una línea Significa que la acción ahora puede resolver a una de las formas que hemos pasó. Cada interfaz tiene una propiedad de tipo. Esta propiedad será nuestro discriminante. Significa que que Typescript puede mirar esta propiedad y decir cuáles serán los otros campos de la interfaz. Por ejemplo, aquí hay una declaración "si":
 
+```typescript
+if (action.type === "ADD_LIST") {
+    return typeof action.payload
+    // Will return "string"
+}
+
+```
+
+Aquí Typescript ya sabe que action.payload sólo puede ser una cadena. El interfaz que tiene tipo: "ADD\_LIST" tiene un campo de carga definido como cadena. Podemos ...lo usan para definir nuestros reductores.
+
+### Definir appStateReducer 
+
+Dentro de src/AppStateContext.tsx define appStateReducer, debería verse así:
+
+```typescript
+   
+const appStateReducer = (state: AppState, action: Action): AppState => {
+  switch (action.type) {
+    case "ADD_LIST": {
+      // Reducer logic here...
+      return {
+        ...state,
+      };
+    }
+    case "ADD_TASK": {
+      // Reducer logic here...
+      return {
+        ...state,
+      };
+    }
+    default: {
+      return state;
+    }
+  }
+};
+```
 
 
 
