@@ -187,5 +187,151 @@ const appStateReducer = (state: AppState, action: Action): AppState => {
 };
 ```
 
+No tenemos que definir constantes para nuestros tipos de acción. El tipo de acción te dará un error si intentas comparar el tipo de acción con algo que no puede ser. Aquí también hay otra trampa, note que usamos paréntesis rizados para definir el alcance del bloque para nuestras declaraciones de caso. Sin esos corchetes, nuestras constantes serían visibles en todo el bloque de interruptores. Digamos que tienes tu reductor definido así, sin corchetes:
+
+### Proporcionar el envío a través del contexto
+
+ Abra el src/AppStateContext.tsx y actualice el AppStateProvider:
+
+```typescript
+export const AppStateProvider = ({ children }: React.PropsWithChildren<{}>) => {
+  const [state, dispatch] = useReducer(appStateReducer, appData);
+  return (
+    <AppStateContext.Provider value={{ state, dispatch }}>
+      {children}
+    </AppStateContext.Provider>
+  );
+};
+```
+
+Ahora proporcionamos el valor del estado desde nuestro appStateReducer en lugar de usar appData de código duro. 
+
+### Agregar listas 
+
+El reductor necesita devolver una nueva instancia de un objeto. Usaremos el operador de difusión para obtener todos los campos del estado anterior. Luego estableceremos el campo de listas para que sea un nuevo arreglo con las listas antiguas más el nuevo ítem:
+
+
+
+```typescript
+case "ADD_LIST": {
+  return {
+    ...state,
+    lists: [
+      ...state.lists,
+      { id: uuid(), text: action.payload, tasks: [] },
+    ],
+  };
+}
+```
+
+La nueva columna tiene campos de texto, id y tareas. El campo de texto contiene el título de la lista, obtenemos su valor de action.payload, las listas serán una matriz vacía y el id de cada lista tiene que ser único. Usaremos uuid para generar nuevos identificadores.
+
+ Necesitamos instalar esta biblioteca. No incluye definiciones de tipos, así que también las instalamos:
+
+```bash
+$ yarn add uuid @types/uuid
+```
+
+Ahora importa uuid dentro del src/AppStateContext:
+
+```typescript
+import uuid from 'uuid'
+```
+
+### Añadiendo tareas 
+
+Agregar tareas es un poco más complejo porque necesitan ser agregadas a listas específicas de la matriz de tareas. Necesitaremos encontrar la lista por su identificación. Añadamos el método findItemIndexById. Crear un nuevo archivo src/utils/findItemIndexById. Vamos a definir una función que aceptará cualquier objeto que tenga un campo id: string. Definir un nuevo elemento de la interfaz.
+
+Ahora usaremos el tipo genérico T que amplía el artículo. Eso significa que hemos restringido nuestro genérico para tener los campos que se definen en la interfaz de Item. En este caso el campo id. Definir la función
+
+```typescript
+export const findItemIndexById = <T extends Item>(items: T[], id: string) => {
+    return items.findIndex((item: T) => item.id === id)
+}  
+```
+
+Ahora vuelve a src/AppStateContext y añade el código para el bloque ADD\_TASK:
+
+```typescript
+    case "ADD_TASK":
+      {
+        const targetLaneIndex = findItemIndexById(
+          state.lists,
+          action.payload.taskId
+        );
+        state.lists[targetLaneIndex].tasks.push({
+          id: uuid(),
+          text: action.payload.text,
+        });
+      }
+```
+
+Aquí primero encontramos el índice de la lista de objetivos y lo guardamos en la constante TargetListIndex. Luego empujamos un nuevo objeto de tarea a la lista con ese índice. Y luego devolvemos un nuevo objeto, creado a partir del estado antiguo usando la sintaxis de dispersión de objetos. 
+
+### Acciones de despacho 
+
+Ve a src/App.tsx y actualiza el código. Ahora también obtenemos la función de despacho de el uso del gancho AppState.
+
+```typescript
+
+const App = () => {
+  const { state, dispatch } = useAppState();
+  return (
+    <AppContainer>
+      {state.lists.map((list, i) => (
+        <Column id={list.id} text={list.text} key={list.id} index={i} />
+      ))}
+      <AddNewItem
+        toggleButtonText="+ Add another list"
+        onAdd={(text) => dispatch({ type: "ADD_LIST", payload: text })}
+      />
+    </AppContainer>
+  );
+};
+```
+
+Actualice también la función AddNewItem onAdd. Ahora llamaremos al método de envío allí, pasando el texto como una carga útil. Abre src/Column.tsx y actualízalo también:
+
+```typescript
+export const Column = ({ text, index, id }: ColumnProps) => {
+  const { state, dispatch } = useAppState();
+  return (
+    <ColumnContainer>
+      <ColumnTitle>{text}</ColumnTitle>
+      {state.lists[index].tasks.map((task, i) => (
+        <Card text={task.text} key={task.id} index={i} />
+      ))}
+      <AddNewItem
+        toggleButtonText="+ Add another card"
+        onAdd={(text) =>
+          dispatch({ type: "ADD_TASK", payload: { text, taskId: id } })
+        }
+        dark
+      />
+    </ColumnContainer>
+  );
+};
+```
+
+Aquí también llamamos la función de despacho. Pasamos la taskId junto al texto porque necesitamos saber qué lista contendrá la nueva tarea. Lancemos la aplicación y comprobemos que podemos crear nuevas tareas y listas.
+
+## Mover los artículos 
+
+Podemos añadir nuevos artículos, es hora de moverlos. Empezaremos con las columnas. 
+
+### Mover las columnas 
+
+Añade un nuevo tipo de acción:
+
+
+
+
+
+
+
+
+
+
+
 
 
