@@ -63,7 +63,7 @@ Como puedes ver, nuestro objeto de datos tiene el tipo AppState.
 
 Definámoslo junto con los tipos de los que depende.
 
-{% code title="src/AppStateContext.tsx" %}
+{% code title="src/App.tsx" %}
 ```typescript
 interface Task {
   id: string;
@@ -235,7 +235,7 @@ $ yarn add uuid @types/uuid
 Ahora importa uuid dentro del src/AppStateContext:
 
 ```typescript
-import uuid from 'uuid'
+import { v1 as uuid } from "uuid"; 
 ```
 
 ### Añadiendo tareas 
