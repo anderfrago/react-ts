@@ -323,6 +323,18 @@ Podemos añadir nuevos artículos, es hora de moverlos. Empezaremos con las colu
 
 Añade un nuevo tipo de acción:
 
+```text
+case "MOVE_LIST": {
+  const { dragIndex, hoverIndex } = action.payload
+  state.lists = moveItem(state.lists, dragIndex, hoverIndex)
+  return { ...state }
+}
+```
+
+Hemos añadido una acción de MOVE\_LIST. Esta acción tiene dragIndex y hoverIndex en su carga útil. Cuando empezamos a arrastrar la columna - recordamos la posición original de la misma y luego la pasamos como dragIndex. Cuando pasamos el ratón por encima de otras columnas, tomamos sus posiciones y las usamos como un hoverIndex. Añade un nuevo bloque de casos a appStateReducer :
+
+Aquí tomamos el dragIndex y el hoverIndex de la carga de acción. Luego calculamos el nuevo valor para la matriz de listas. Para ello utilizamos la función moveItem, que Crea un nuevo archivo src/moveItem.ts que mantendrá esta función:
+
 
 
 
