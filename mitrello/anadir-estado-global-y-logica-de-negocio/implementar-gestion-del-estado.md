@@ -137,7 +137,9 @@ En este capítulo, definiremos las acciones y los reductores necesarios para cre
 
 ### Definir las acciones
 
- Empezaremos añadiendo dos acciones: AGREGAR\_TAREAS y AGREGAR\_LISTAS. Para hacer esto tendremos que definir un tipo de acción. Abre src/AppStateContext y define un nuevo tipo:
+ Empezaremos añadiendo dos acciones: AGREGAR\_TAREAS y AGREGAR\_LISTAS. Para hacer esto tendremos que definir un tipo de acción. 
+
+Abre src/AppStateContext y define un nuevo tipo:
 
 {% code title="AppStateContext.tsx" %}
 ```typescript
@@ -153,7 +155,11 @@ type Action =
 ```
 {% endcode %}
 
-La técnica que estamos usando aquí se llama unión discriminada. Hemos definido un tipo de acción y luego hemos pasado dos interfaces separadas por un Una línea Significa que la acción ahora puede resolver a una de las formas que hemos pasó. Cada interfaz tiene una propiedad de tipo. Esta propiedad será nuestro discriminante. Significa que que Typescript puede mirar esta propiedad y decir cuáles serán los otros campos de la interfaz. Por ejemplo, aquí hay una declaración "si":
+La técnica que estamos usando aquí se llama unión discriminada. Hemos definido un tipo de acción y luego hemos pasado dos interfaces separadas por una jlína vertical. Significa que la Action ahora puede resolver a una de las formas que hemos pasó.
+
+Cada interfaz tiene una propiedad de tipo. Esta propiedad será nuestro discriminante. Significa que que Typescript puede mirar esta propiedad y decir cuáles serán los otros campos de la interfaz.
+
+ Por ejemplo, aquí hay una declaración "si":
 
 ```typescript
 if (action.type === "ADD_LIST") {
